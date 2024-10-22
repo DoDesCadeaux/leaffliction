@@ -44,6 +44,7 @@ if __name__ == "__main__":
         sub_dir_sizes.keys(),
         sub_dir_sizes.values(),
         color=plt.cm.viridis(np.linspace(0, 1, len(sub_dir_sizes))))
+
     ax1.set_ylabel("Leaves count")
     ax1.set_xlabel("Leaf type")
     ax1.set_xticklabels(sub_dir_sizes.keys(), rotation=90)
@@ -53,5 +54,6 @@ if __name__ == "__main__":
         sub_dir_sizes.values(),
         labels=sub_dir_sizes.keys(),
         autopct='%1.0f%%')
+
     fig.tight_layout()
     plt.show()
