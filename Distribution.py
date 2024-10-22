@@ -1,6 +1,10 @@
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 from sys import argv
+
+from distributed.diagnostics.progress_stream import colors
+from networkx.algorithms.bipartite.basic import color
 
 
 def path_sub_dir(directory: str) -> list:
@@ -31,7 +35,18 @@ if __name__ == "__main__":
         print("Incorrect number of args")
         exit(1)
 
-    sub_dir_sizes = get_sub_dir_sizes(list_sub_dir(argv[1]), path_sub_dir(argv[1]))
-    print(sub_dir_sizes)
+    folder = argv[1]
 
+    sub_dir_sizes = get_sub_dir_sizes(list_sub_dir(folder), path_sub_dir(folder))
 
+    plt.figure(figsize=(10, 5))
+    plt.subplot(121)
+    plt.bar(sub_dir_sizes.keys(), sub_dir_sizes.values(), color=plt.cm.viridis(np.linspace(0, 1, len(sub_dir_sizes))))
+    plt.ylabel("Leaves count")
+    plt.xlabel("Leaf type")
+    plt.xticks(rotation=90)
+
+    plt.subplot(122)
+    plt.pie(sub_dir_sizes.values(), labels=sub_dir_sizes.keys(), autopct='%1.0f%%')
+    plt.tight_layout()
+    plt.show()
