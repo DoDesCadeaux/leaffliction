@@ -3,9 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sys import argv
 
-from distributed.diagnostics.progress_stream import colors
-from networkx.algorithms.bipartite.basic import color
-
 
 def path_sub_dir(directory: str) -> list:
     sub_dir = os.listdir(directory)
@@ -37,15 +34,24 @@ if __name__ == "__main__":
 
     folder = argv[1]
 
-    sub_dir_sizes = get_sub_dir_sizes(list_sub_dir(folder), path_sub_dir(folder))
+    sub_dir_sizes = get_sub_dir_sizes(
+        list_sub_dir(folder),
+        path_sub_dir(folder)
+    )
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-    ax1.bar(sub_dir_sizes.keys(), sub_dir_sizes.values(), color=plt.cm.viridis(np.linspace(0, 1, len(sub_dir_sizes))))
+    ax1.bar(
+        sub_dir_sizes.keys(),
+        sub_dir_sizes.values(),
+        color=plt.cm.viridis(np.linspace(0, 1, len(sub_dir_sizes))))
     ax1.set_ylabel("Leaves count")
     ax1.set_xlabel("Leaf type")
     ax1.set_xticklabels(sub_dir_sizes.keys(), rotation=90)
 
     fig.suptitle("Leaves Class Distribution")
-    ax2.pie(sub_dir_sizes.values(), labels=sub_dir_sizes.keys(), autopct='%1.0f%%')
+    ax2.pie(
+        sub_dir_sizes.values(),
+        labels=sub_dir_sizes.keys(),
+        autopct='%1.0f%%')
     fig.tight_layout()
     plt.show()
