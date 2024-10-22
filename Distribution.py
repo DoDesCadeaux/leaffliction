@@ -39,14 +39,13 @@ if __name__ == "__main__":
 
     sub_dir_sizes = get_sub_dir_sizes(list_sub_dir(folder), path_sub_dir(folder))
 
-    plt.figure(figsize=(10, 5))
-    plt.subplot(121)
-    plt.bar(sub_dir_sizes.keys(), sub_dir_sizes.values(), color=plt.cm.viridis(np.linspace(0, 1, len(sub_dir_sizes))))
-    plt.ylabel("Leaves count")
-    plt.xlabel("Leaf type")
-    plt.xticks(rotation=90)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    ax1.bar(sub_dir_sizes.keys(), sub_dir_sizes.values(), color=plt.cm.viridis(np.linspace(0, 1, len(sub_dir_sizes))))
+    ax1.set_ylabel("Leaves count")
+    ax1.set_xlabel("Leaf type")
+    ax1.set_xticklabels(sub_dir_sizes.keys(), rotation=90)
 
-    plt.subplot(122)
-    plt.pie(sub_dir_sizes.values(), labels=sub_dir_sizes.keys(), autopct='%1.0f%%')
-    plt.tight_layout()
+    fig.suptitle("Leaves Class Distribution")
+    ax2.pie(sub_dir_sizes.values(), labels=sub_dir_sizes.keys(), autopct='%1.0f%%')
+    fig.tight_layout()
     plt.show()
