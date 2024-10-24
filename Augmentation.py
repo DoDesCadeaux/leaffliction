@@ -40,7 +40,7 @@ def blur(image: np.array, blur_type: str) -> np.array:
         exit(1)
 
     if blur_type == 'bilateral':
-        return cv.bilateralFilter(image, 9, 60, 30)
+        return cv.bilateralFilter(image, 9, 75, 75)
     elif blur_type == 'gaussian':
         return cv.GaussianBlur(image, (7, 7), 0)
     else:
@@ -97,11 +97,10 @@ if __name__ == "__main__":
     flip_img = flip(img_read_rgb, 1)
     rotate_img = rotation(img_read_rgb, 90)
     blur_image = blur(img_read_rgb, 'bilateral')
-
     filtered = color_filtering(img_read_rgb, 1, 0, 1)
     dilated = dilation(img_read_rgb)
 
-    images = [img_read_rgb, flip_img, rotate_img, blur_image, filtered, dilated, dilated]
-    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Color Filter', 'Dilation', 'Dilation 2']
+    images = [img_read_rgb, flip_img, rotate_img, blur_image, filtered, dilated]
+    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Color Filter', 'Dilation']
 
     show_images(images, categories)
