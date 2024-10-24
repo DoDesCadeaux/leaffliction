@@ -1,5 +1,3 @@
-import cv2
-
 import Distribution
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -69,11 +67,24 @@ def dilation(image: np.array) -> np.array:
 
 
 def show_images(images: list, categories: list) -> None:
-    fig, axs = plt.subplots(1, len(images), figsize=(20, 20))
-    for ax, image, category in zip(axs, images, categories):
+    n_rows = 2
+    n_cols = (len(images) + 1) // 2
+
+    fig, axs = plt.subplots(n_rows, n_cols, figsize=(20, 20))
+    axs = axs.flatten()
+
+    last = 0
+
+    for i, (ax, image, category) in enumerate(zip(axs, images, categories)):
         ax.imshow(image)
         ax.axis('off')
         ax.set_title(category)
+        last = i
+
+    for j in range(last + 1, len(axs)):
+        axs[j].axis('off')
+
+    plt.tight_layout()
     plt.show()
 
 
@@ -90,7 +101,7 @@ if __name__ == "__main__":
     filtered = color_filtering(img_read_rgb, 1, 0, 1)
     dilated = dilation(img_read_rgb)
 
-    images = [img_read_rgb, flip_img, rotate_img, blur_image, filtered, dilated]
-    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Color Filter', 'Dilation']
+    images = [img_read_rgb, flip_img, rotate_img, blur_image, filtered, dilated, dilated]
+    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Color Filter', 'Dilation', 'Dilation 2']
 
     show_images(images, categories)
