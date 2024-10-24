@@ -36,6 +36,9 @@ psutil==6.1.0
 pycodestyle==2.12.1
 pyflakes==3.2.0
 pyparsing==3.2.0
+PyQt6==6.7.1
+PyQt6-Qt6==6.7.3
+PyQt6_sip==13.8.0
 python-dateutil==2.9.0.post0
 pytz==2024.2
 PyYAML==6.0.2
