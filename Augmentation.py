@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sys import argv
 
+from Distribution import get_sub_dir_sizes, list_sub_dir, path_sub_dir
+
 
 def flip(image: np.array, axis: str | int) -> np.array:
     accepted_axis = ['horizontal', 'vertical', 'h', 'v', 0, 1]
@@ -88,6 +90,10 @@ def show_images(images: list, categories: list) -> None:
     plt.show()
 
 
+# Todo -> Count all sub_dir_images to augment the underrepresented data
+# Todo -> Augment only the sub_dir with less images than biggest sub_dir
+# Todo -> Random augmentation for all sub_dirs
+
 if __name__ == "__main__":
     image = argv[1]
 
@@ -104,3 +110,5 @@ if __name__ == "__main__":
     categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Color Filter', 'Dilation']
 
     show_images(images, categories)
+
+    print(get_sub_dir_sizes(list_sub_dir(argv[1]), path_sub_dir(argv[1])))
