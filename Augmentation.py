@@ -45,8 +45,7 @@ def blur(image: np.array, blur_type: str) -> np.array:
         return cv.bilateralFilter(image, 9, 75, 75)
     elif blur_type == 'gaussian':
         return cv.GaussianBlur(image, (7, 7), 0)
-    else:
-        return cv.medianBlur(image, 5)
+    return cv.medianBlur(image, 5)
 
 
 def color_filtering(image: np.array, red: float, green: float, blue: float) -> np.array:
@@ -57,7 +56,6 @@ def color_filtering(image: np.array, red: float, green: float, blue: float) -> n
     r = (r * red).clip(0, 255).astype(np.uint8)
 
     image_reduced = cv.merge([b, g, r])
-
     return image_reduced
 
 
