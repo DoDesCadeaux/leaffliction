@@ -1,3 +1,5 @@
+import cv2
+
 import Distribution
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -32,7 +34,7 @@ def rotation(image: np.array, degrees: int) -> np.array:
     return rotated_image
 
 
-def blur(image: np.array, blur_type: 'str') -> np.array:
+def blur(image: np.array, blur_type: str) -> np.array:
     blur_types = ['gaussian', 'median', 'bilateral']
 
     if blur_type not in blur_types:
@@ -47,8 +49,27 @@ def blur(image: np.array, blur_type: 'str') -> np.array:
         return cv.medianBlur(image, 5)
 
 
+def color_filtering(image: np.array, red: float, green: float, blue: float) -> np.array:
+    b, g, r = cv.split(image)
+
+    b = (b * blue).clip(0, 255).astype(np.uint8)
+    g = (g * green).clip(0, 255).astype(np.uint8)
+    r = (r * red).clip(0, 255).astype(np.uint8)
+
+    image_reduced = cv.merge([b, g, r])
+
+    return image_reduced
+
+
+def dilation(image: np.array) -> np.array:
+    kernel = np.ones((2, 2), np.uint8)
+
+    img_dilation = cv.dilate(image, kernel, iterations=1)
+    return img_dilation
+
+
 def show_images(images: list, categories: list) -> None:
-    fig, axs = plt.subplots(1, len(images), figsize=(10, 5))
+    fig, axs = plt.subplots(1, len(images), figsize=(20, 20))
     for ax, image, category in zip(axs, images, categories):
         ax.imshow(image)
         ax.axis('off')
@@ -66,7 +87,10 @@ if __name__ == "__main__":
     rotate_img = rotation(img_read_rgb, 90)
     blur_image = blur(img_read_rgb, 'bilateral')
 
-    images = [img_read_rgb, flip_img, rotate_img, blur_image]
-    categories = ['Original', 'Flip', 'Rotation', 'Blur']
+    filtered = color_filtering(img_read_rgb, 1, 0, 1)
+    dilated = dilation(img_read_rgb)
+
+    images = [img_read_rgb, flip_img, rotate_img, blur_image, filtered, dilated]
+    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Color Filter', 'Dilation']
 
     show_images(images, categories)
