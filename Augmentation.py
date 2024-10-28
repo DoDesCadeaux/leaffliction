@@ -1,6 +1,7 @@
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 from sys import argv
 from Distribution import get_sub_dir_sizes, list_sub_dir, path_sub_dir
 
@@ -104,16 +105,14 @@ def show_images(images: list, categories: list) -> None:
     plt.show()
 
 
-def random_augmentation():
+def random_augmentation(folder: str) -> None:
     dir_sizes = get_sub_dir_sizes(list_sub_dir(argv[1]), path_sub_dir(argv[1]))
 
     largest_dir_size = max(dir_sizes.values())
 
     print(path_sub_dir(argv[1]))
-    #
     print(dir_sizes)
 
-    folder = argv[1]
     for sub_dir, size in dir_sizes.items():
         difference = largest_dir_size - size
         if size < largest_dir_size:
@@ -122,24 +121,54 @@ def random_augmentation():
                     f.write(f"test: {i}")
 
 
+def augmentation(image: np.array, file_path: str) -> None:
+    transformations = {
+        '_Flip': flip(image, 1),
+        '_Rotate': rotation(image, 90),
+        '_Blur': blur(image, 'bilateral'),
+        '_Crop': scaling(image),
+        '_Dilation': dilation(image),
+        '_Contrast': contrast(image, 1.5, 0)
+    }
+
+    split_path = file_path.split("/")
+    folder_path = split_path[0]
+    file_name, file_ext = split_path[-1].split(".")
+
+    augmented_dir = os.path.join(folder_path, "augmented_directory")
+    os.makedirs(augmented_dir, exist_ok=True)
+
+    for transf_name, transformation in transformations.items():
+        file = f"{augmented_dir}/{file_name}{transf_name}.{file_ext}"
+        cv.imwrite(file, transformation)
+
+
 # Todo -> Count all sub_dir_images to augment the underrepresented data
 # Todo -> Augment only the sub_dir with less images than biggest sub_dir
 # Todo -> Random augmentation for all sub_dirs
 
 if __name__ == "__main__":
-    image = argv[1]
+    image_path = argv[1]
 
-    img_read_bgr = cv.imread(image, cv.IMREAD_COLOR)
+    img_read_bgr = cv.imread(image_path, cv.IMREAD_COLOR)
     img_read_rgb = cv.cvtColor(img_read_bgr, cv.COLOR_BGR2RGB)
 
-    flip_img = flip(img_read_rgb, 1)
-    rotate_img = rotation(img_read_rgb, 90)
-    blur_image = blur(img_read_rgb, 'bilateral')
-    cropped = scaling(img_read_rgb)
-    dilated = dilation(img_read_rgb)
-    contrasted = contrast(img_read_rgb, 1.5, 0)
+    augmentation(img_read_rgb, image_path)
 
-    images = [img_read_rgb, flip_img, rotate_img, blur_image, cropped, dilated, contrasted]
-    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Scaled', 'Dilation', 'Contrast']
 
-    show_images(images, categories)
+
+    # flip_img = flip(img_read_rgb, 1)
+    # rotate_img = rotation(img_read_rgb, 90)
+    # blur_image = blur(img_read_rgb, 'bilateral')
+    # cropped = scaling(img_read_rgb)
+    # dilated = dilation(img_read_rgb)
+    # contrasted = contrast(img_read_rgb, 1.5, 0)
+    #
+    # images = [img_read_rgb, flip_img, rotate_img, blur_image, cropped, dilated, contrasted]
+    # categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Scaled', 'Dilation', 'Contrast']
+
+    # show_images(images, categories)
+
+    # random_augmentation(argv[1])
+
+
