@@ -1,3 +1,5 @@
+import os
+
 import Distribution
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -100,6 +102,24 @@ def show_images(images: list, categories: list) -> None:
     plt.show()
 
 
+def random_augmentation():
+    dir_sizes = get_sub_dir_sizes(list_sub_dir(argv[1]), path_sub_dir(argv[1]))
+
+    largest_dir_size = max(dir_sizes.values())
+
+    print(path_sub_dir(argv[1]))
+    #
+    print(dir_sizes)
+
+    folder = argv[1]
+    for sub_dir, size in dir_sizes.items():
+        difference = largest_dir_size - size
+        if size < largest_dir_size:
+            for i in range(difference):
+                with open(f"{folder}/{sub_dir}/augmented_image_{i}.txt", 'w') as f:
+                    f.write(f"test: {i}")
+
+
 # Todo -> Count all sub_dir_images to augment the underrepresented data
 # Todo -> Augment only the sub_dir with less images than biggest sub_dir
 # Todo -> Random augmentation for all sub_dirs
@@ -120,5 +140,3 @@ if __name__ == "__main__":
     categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Scaled', 'Dilation']
 
     show_images(images, categories)
-
-    # print(get_sub_dir_sizes(list_sub_dir(argv[1]), path_sub_dir(argv[1])))

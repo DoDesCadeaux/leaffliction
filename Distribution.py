@@ -5,6 +5,8 @@ from sys import argv
 
 
 def path_sub_dir(directory: str) -> list:
+    if directory.endswith('/'):
+        directory = directory.removesuffix('/')
     sub_dir = [f"{directory}/{i}" for i in os.listdir(directory) if os.path.isdir(f"{directory}/{i}")]
     return sub_dir
 
