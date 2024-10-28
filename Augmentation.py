@@ -66,6 +66,18 @@ def dilation(image: np.array) -> np.array:
     return img_dilation
 
 
+def scaling(image: np.array) -> np.array:
+    desired_width = 256
+    desired_height = 256
+
+    cropped_img = image[50:, 35:220]
+
+    dim = (desired_width, desired_height)
+    resized_cropped = cv.resize(cropped_img, dsize=dim, interpolation=cv.INTER_AREA)
+
+    return resized_cropped
+
+
 def show_images(images: list, categories: list) -> None:
     n_rows = 2
     n_cols = (len(images) + 1) // 2
@@ -101,12 +113,12 @@ if __name__ == "__main__":
     flip_img = flip(img_read_rgb, 1)
     rotate_img = rotation(img_read_rgb, 90)
     blur_image = blur(img_read_rgb, 'bilateral')
-    filtered = color_filtering(img_read_rgb, 1, 0, 1)
+    cropped = scaling(img_read_rgb)
     dilated = dilation(img_read_rgb)
 
-    images = [img_read_rgb, flip_img, rotate_img, blur_image, filtered, dilated]
-    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Color Filter', 'Dilation']
+    images = [img_read_rgb, flip_img, rotate_img, blur_image, cropped, dilated]
+    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Scaled', 'Dilation']
 
     show_images(images, categories)
 
-    print(get_sub_dir_sizes(list_sub_dir(argv[1]), path_sub_dir(argv[1])))
+    # print(get_sub_dir_sizes(list_sub_dir(argv[1]), path_sub_dir(argv[1])))
