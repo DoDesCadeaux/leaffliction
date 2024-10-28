@@ -1,11 +1,7 @@
-import os
-
-import Distribution
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
 from sys import argv
-
 from Distribution import get_sub_dir_sizes, list_sub_dir, path_sub_dir
 
 
@@ -61,6 +57,12 @@ def color_filtering(image: np.array, red: float, green: float, blue: float) -> n
     return image_reduced
 
 
+def contrast(image: np.array, alpha: float, beta: float) -> np.array:
+    new_image = cv.convertScaleAbs(image, alpha=alpha, beta=beta)
+
+    return new_image
+
+
 def dilation(image: np.array) -> np.array:
     kernel = np.ones((2, 2), np.uint8)
 
@@ -72,7 +74,7 @@ def scaling(image: np.array) -> np.array:
     desired_width = 256
     desired_height = 256
 
-    cropped_img = image[50:, 35:220]
+    cropped_img = image[25:, 35:220]
 
     dim = (desired_width, desired_height)
     resized_cropped = cv.resize(cropped_img, dsize=dim, interpolation=cv.INTER_AREA)
@@ -135,8 +137,9 @@ if __name__ == "__main__":
     blur_image = blur(img_read_rgb, 'bilateral')
     cropped = scaling(img_read_rgb)
     dilated = dilation(img_read_rgb)
+    contrasted = contrast(img_read_rgb, 1.5, 0)
 
-    images = [img_read_rgb, flip_img, rotate_img, blur_image, cropped, dilated]
-    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Scaled', 'Dilation']
+    images = [img_read_rgb, flip_img, rotate_img, blur_image, cropped, dilated, contrasted]
+    categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Scaled', 'Dilation', 'Contrast']
 
     show_images(images, categories)
