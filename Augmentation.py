@@ -147,15 +147,14 @@ def augmentation(image: np.array, file_path: str) -> None:
 # Todo -> Augment only the sub_dir with less images than biggest sub_dir
 # Todo -> Random augmentation for all sub_dirs
 
-if __name__ == "__main__":
+
+def main():
     image_path = argv[1]
 
     img_read_bgr = cv.imread(image_path, cv.IMREAD_COLOR)
     img_read_rgb = cv.cvtColor(img_read_bgr, cv.COLOR_BGR2RGB)
 
     augmentation(img_read_rgb, image_path)
-
-
 
     # flip_img = flip(img_read_rgb, 1)
     # rotate_img = rotation(img_read_rgb, 90)
@@ -172,3 +171,5 @@ if __name__ == "__main__":
     # random_augmentation(argv[1])
 
 
+if __name__ == "__main__":
+    main()
