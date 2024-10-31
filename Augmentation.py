@@ -133,14 +133,17 @@ def augmentation(image: np.array, file_path: str) -> None:
 
     split_path = file_path.split("/")
     folder_path = split_path[0]
+    sub_dir_path = "/".join(split_path[1:-1])
     file_name, file_ext = split_path[-1].split(".")
 
-    augmented_dir = os.path.join(folder_path, "augmented_directory")
+    augmented_dir = os.path.join("augmented_directory", sub_dir_path)
     os.makedirs(augmented_dir, exist_ok=True)
 
     for transf_name, transformation in transformations.items():
-        file = f"{augmented_dir}/{file_name}{transf_name}.{file_ext}"
-        cv.imwrite(file, transformation)
+        file_augment_dir = f"{augmented_dir}/{file_name}{transf_name}.{file_ext}"
+        file_actual_dir = f"{folder_path}/{sub_dir_path}/{file_name}{transf_name}.{file_ext}"
+        cv.imwrite(file_augment_dir, transformation)
+        cv.imwrite(file_actual_dir, transformation)
 
 
 # Todo -> Count all sub_dir_images to augment the underrepresented data
@@ -155,18 +158,6 @@ def main():
     img_read_rgb = cv.cvtColor(img_read_bgr, cv.COLOR_BGR2RGB)
 
     augmentation(img_read_rgb, image_path)
-
-    # flip_img = flip(img_read_rgb, 1)
-    # rotate_img = rotation(img_read_rgb, 90)
-    # blur_image = blur(img_read_rgb, 'bilateral')
-    # cropped = scaling(img_read_rgb)
-    # dilated = dilation(img_read_rgb)
-    # contrasted = contrast(img_read_rgb, 1.5, 0)
-    #
-    # images = [img_read_rgb, flip_img, rotate_img, blur_image, cropped, dilated, contrasted]
-    # categories = ['Original', 'Flip', 'Rotation', 'Blur', 'Scaled', 'Dilation', 'Contrast']
-
-    # show_images(images, categories)
 
     # random_augmentation(argv[1])
 
