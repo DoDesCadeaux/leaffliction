@@ -14,9 +14,9 @@ def flip(image: np.array, axis: str | int) -> np.array:
         exit(1)
 
     if axis in ['horizontal', 'h', 0]:
-        return image[::-1]
+        return image[::-1, ::, ::-1]
     elif axis in ['vertical', 'v', 1]:
-        return image[::, ::-1]
+        return image[::, ::-1, ::-1]
 
 
 def rotation(image: np.array, degrees: int) -> np.array:
@@ -30,7 +30,7 @@ def rotation(image: np.array, degrees: int) -> np.array:
     rotation_matrix = cv.getRotationMatrix2D(center, degrees, scale)
 
     rotated_image = cv.warpAffine(image, rotation_matrix, (image.shape[1], image.shape[0]))
-    return rotated_image
+    return rotated_image[:, :, ::-1]
 
 
 def blur(image: np.array, blur_type: str) -> np.array:
@@ -41,10 +41,10 @@ def blur(image: np.array, blur_type: str) -> np.array:
         exit(1)
 
     if blur_type == 'bilateral':
-        return cv.bilateralFilter(image, 9, 75, 75)
+        return cv.bilateralFilter(image[:, :, ::-1], 9, 75, 75)
     elif blur_type == 'gaussian':
-        return cv.GaussianBlur(image, (7, 7), 0)
-    return cv.medianBlur(image, 5)
+        return cv.GaussianBlur(image[:, :, ::-1], (7, 7), 0)
+    return cv.medianBlur(image[:, :, ::-1], 5)
 
 
 def color_filtering(image: np.array, red: float, green: float, blue: float) -> np.array:
@@ -55,20 +55,20 @@ def color_filtering(image: np.array, red: float, green: float, blue: float) -> n
     r = (r * red).clip(0, 255).astype(np.uint8)
 
     image_reduced = cv.merge([b, g, r])
-    return image_reduced
+    return image_reduced[:, :, ::-1]
 
 
 def contrast(image: np.array, alpha: float, beta: float) -> np.array:
     new_image = cv.convertScaleAbs(image, alpha=alpha, beta=beta)
 
-    return new_image
+    return new_image[:, :, ::-1]
 
 
 def dilation(image: np.array) -> np.array:
     kernel = np.ones((2, 2), np.uint8)
 
     img_dilation = cv.dilate(image, kernel, iterations=1)
-    return img_dilation
+    return img_dilation[:, :, ::-1]
 
 
 def scaling(image: np.array) -> np.array:
@@ -80,7 +80,7 @@ def scaling(image: np.array) -> np.array:
     dim = (desired_width, desired_height)
     resized_cropped = cv.resize(cropped_img, dsize=dim, interpolation=cv.INTER_AREA)
 
-    return resized_cropped
+    return resized_cropped[:, :, ::-1]
 
 
 def show_images(images: list, categories: list) -> None:
@@ -105,7 +105,7 @@ def show_images(images: list, categories: list) -> None:
     plt.show()
 
 
-def random_augmentation(folder: str) -> None:
+def random_automatic_augmentation(folder: str) -> None:
     dir_sizes = get_sub_dir_sizes(list_sub_dir(argv[1]), path_sub_dir(argv[1]))
 
     largest_dir_size = max(dir_sizes.values())
