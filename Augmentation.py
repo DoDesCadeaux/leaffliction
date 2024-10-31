@@ -1,7 +1,10 @@
+import random
+import math
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import json
 from sys import argv
 from Distribution import get_sub_dir_sizes, list_sub_dir, path_sub_dir
 
@@ -105,23 +108,25 @@ def show_images(images: list, categories: list) -> None:
     plt.show()
 
 
-def random_automatic_augmentation(folder: str) -> None:
-    dir_sizes = get_sub_dir_sizes(list_sub_dir(argv[1]), path_sub_dir(argv[1]))
+def get_dir_size(path: str) -> int:
+    files = os.listdir(path)
 
-    largest_dir_size = max(dir_sizes.values())
-
-    print(path_sub_dir(argv[1]))
-    print(dir_sizes)
-
-    for sub_dir, size in dir_sizes.items():
-        difference = largest_dir_size - size
-        if size < largest_dir_size:
-            for i in range(difference):
-                with open(f"{folder}/{sub_dir}/augmented_image_{i}.txt", 'w') as f:
-                    f.write(f"test: {i}")
+    return len(files)
 
 
-def augmentation(image: np.array, file_path: str) -> None:
+def calculate_image_needed(sub_dirs):
+    max_size = max(sub_dirs.values())
+
+    images_needed = {}
+
+    for folder, size in sub_dirs.items():
+        difference = int(max_size) - int(size)
+        images_needed[folder] = math.ceil(difference / 6)
+
+    return images_needed
+
+
+def augmentation(image: np.array, file_path: str, random_automatic: int) -> None:
     transformations = {
         '_Flip': flip(image, 1),
         '_Rotate': rotation(image, 90),
@@ -136,19 +141,35 @@ def augmentation(image: np.array, file_path: str) -> None:
     sub_dir_path = "/".join(split_path[1:-1])
     file_name, file_ext = split_path[-1].split(".")
 
-    augmented_dir = os.path.join("augmented_directory", sub_dir_path)
-    os.makedirs(augmented_dir, exist_ok=True)
+    if random_automatic == 0:
+        augmented_dir = os.path.join("augmented_directory", sub_dir_path)
+        os.makedirs(augmented_dir, exist_ok=True)
 
-    for transf_name, transformation in transformations.items():
-        file_augment_dir = f"{augmented_dir}/{file_name}{transf_name}.{file_ext}"
-        file_actual_dir = f"{folder_path}/{sub_dir_path}/{file_name}{transf_name}.{file_ext}"
-        cv.imwrite(file_augment_dir, transformation)
-        cv.imwrite(file_actual_dir, transformation)
+        for transf_name, transformation in transformations.items():
+            file_augment_dir = f"{augmented_dir}/{file_name}{transf_name}.{file_ext}"
+            file_actual_dir = f"{folder_path}/{sub_dir_path}/{file_name}{transf_name}.{file_ext}"
+            cv.imwrite(file_augment_dir, transformation)
+            cv.imwrite(file_actual_dir, transformation)
+    else:
+        dir_sizes = get_sub_dir_sizes(list_sub_dir(folder_path), path_sub_dir(folder_path))
 
+        images_needed = calculate_image_needed(dir_sizes)
 
-# Todo -> Count all sub_dir_images to augment the underrepresented data
-# Todo -> Augment only the sub_dir with less images than biggest sub_dir
-# Todo -> Random augmentation for all sub_dirs
+        for sub_dir, old_length in dir_sizes.items():
+            augmented_dir = os.path.join("augmented_directory", sub_dir)
+            os.makedirs(augmented_dir, exist_ok=True)
+
+            images = os.listdir(f"{folder_path}/{sub_dir}")
+            random_images = random.sample(images, images_needed[sub_dir])
+
+            if len(random_images) > 0:
+                for transf_name, transformation in transformations.items():
+                    for image in random_images:
+                        file_name, file_ext = image.split(".")
+                        file_augment_dir = f"{augmented_dir}/{file_name}{transf_name}.{file_ext}"
+                        file_actual_dir = f"{folder_path}/{sub_dir}/{file_name}{transf_name}.{file_ext}"
+                        cv.imwrite(file_augment_dir, transformation)
+                        cv.imwrite(file_actual_dir, transformation)
 
 
 def main():
@@ -157,9 +178,29 @@ def main():
     img_read_bgr = cv.imread(image_path, cv.IMREAD_COLOR)
     img_read_rgb = cv.cvtColor(img_read_bgr, cv.COLOR_BGR2RGB)
 
-    augmentation(img_read_rgb, image_path)
+    try:
+        with open('data_augmentation.json', 'r') as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        with open('data_augmentation.json', 'w') as outfile:
+            data = {
+                'already_augmented': 0
+            }
 
-    # random_augmentation(argv[1])
+            json.dump(data, outfile)
+
+    if data['already_augmented'] == 0:
+        augmentation(img_read_rgb, image_path, 1)
+
+        data = {
+            'already_augmented': 1
+        }
+
+        with open('data_augmentation.json', 'w') as file:
+            json.dump(data, file)
+    elif data['already_augmented'] == 1:
+        print("Data Already Augmented")
+        exit(1)
 
 
 if __name__ == "__main__":
