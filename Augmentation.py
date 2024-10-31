@@ -175,6 +175,13 @@ def augmentation(image: np.array, file_path: str, random_automatic: int) -> None
 def main():
     image_path = argv[1]
 
+    accepted_images = ["jpg", "png", "jpeg"]
+    _, file_extension = image_path.split(".")
+
+    if file_extension.lower() not in accepted_images:
+        print(f"Error: '{file_extension}' file type is not valid")
+        exit(1)
+
     img_read_bgr = cv.imread(image_path, cv.IMREAD_COLOR)
     img_read_rgb = cv.cvtColor(img_read_bgr, cv.COLOR_BGR2RGB)
 
